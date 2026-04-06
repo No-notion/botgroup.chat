@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Share2, Settings2, ChevronLeft } from 'lucide-react';
+import { Send, Share2, Settings2, ChevronLeft, Sparkles } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,6 +19,7 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import { SharePoster } from '@/pages/chat/components/SharePoster';
 import { MembersManagement } from '@/pages/chat/components/MembersManagement';
+import CharacterManager from '@/pages/chat/components/CharacterManager';
 import Sidebar from './Sidebar';
 import ClawChatUI from './ClawChatUI';
 import { AdBanner, AdBannerMobile } from './AdSection';
@@ -74,6 +75,7 @@ const ChatUI = () => {
   const [users, setUsers] = useState([]);
   const [allNames, setAllNames] = useState([]);
   const [showMembers, setShowMembers] = useState(false);
+  const [showCharacterManager, setShowCharacterManager] = useState(false);
   const [messages, setMessages] = useState([]);
   const [showAd, setShowAd] = useState(false);
   const [inputMessage, setInputMessage] = useState("");
@@ -555,6 +557,11 @@ const ChatUI = () => {
                   <Button variant="ghost" size="icon" onClick={() => setShowMembers(true)}>
                     <Settings2 className="w-5 h-5" />
                   </Button>
+                  {userStore.userInfo?.id && (
+                    <Button variant="ghost" size="icon" onClick={() => setShowCharacterManager(true)} title="角色管理">
+                      <Sparkles className="w-5 h-5" />
+                    </Button>
+                  )}
                 </div>
               </div>
             </header>
@@ -713,6 +720,16 @@ const ChatUI = () => {
         isOpen={showPoster}
         onClose={() => setShowPoster(false)}
         chatAreaRef={chatAreaRef}
+      />
+      
+      {/* 角色管理组件 */}
+      <CharacterManager 
+        isOpen={showCharacterManager}
+        onClose={() => setShowCharacterManager(false)}
+        onCharactersChange={() => {
+          // 刷新页面以加载新角色
+          window.location.reload();
+        }}
       />
     </>
   );

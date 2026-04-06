@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
+import PasswordLogin from './comonents/PasswordLogin';
 
 export default function Login() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [loginMethod, setLoginMethod] = useState('oauth');
 
   React.useEffect(() => {
     const isLogin = localStorage.getItem('token');
@@ -37,7 +39,17 @@ export default function Login() {
     window.location.href = '/api/auth/github/login';
   };
 
+  const handleLoginSuccess = (token) => {
+    localStorage.setItem('token', token);
+    window.location.href = '/';
+  };
+
   const icpNumber = window.APP_CONFIG?.ICP_NUMBER;
+
+  // 如果选择账户密码登录，显示密码登录组件
+  if (loginMethod === 'password') {
+    return <PasswordLogin handleLoginSuccess={handleLoginSuccess} />;
+  }
 
   return (
     <div className="fixed inset-0 bg-white flex items-center justify-center">
@@ -53,6 +65,23 @@ export default function Login() {
         
         <div className={`text-gray-500 ${isMobile ? 'mb-6' : 'mb-8'} text-center ${isMobile ? 'text-sm' : 'text-base'}`}>
           登录以继续
+        </div>
+
+        {/* 账户密码登录按钮 */}
+        <button
+          onClick={() => setLoginMethod('password')}
+          className={`w-full flex items-center justify-center gap-2 border border-[#ff6600] rounded-lg bg-white hover:bg-[#fff5eb] transition-colors ${isMobile ? 'py-2.5 text-sm' : 'py-3 text-base'}`}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="#ff6600" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span className="text-[#ff6600]">使用账户密码登录</span>
+        </button>
+
+        <div className={`flex items-center my-4 ${isMobile ? 'my-3' : 'my-4'}`}>
+          <div className="flex-1 border-t border-gray-300"></div>
+          <span className={`px-3 text-gray-400 ${isMobile ? 'text-xs' : 'text-sm'}`}>或</span>
+          <div className="flex-1 border-t border-gray-300"></div>
         </div>
 
         <button

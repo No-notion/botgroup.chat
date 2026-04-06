@@ -1,9 +1,11 @@
+name = "botgroup-chat"
+pages_build_output_dir = "dist"
+
 [[kv_namespaces]]
 binding = "bgkv"
-id = "cbd11575c3504e6bb043c1c250d2f7ed"
-preview_id = "cbd11575c3504e6bb043c1c250d2f7ed"  # 本地开发环境使用 
+id = "bc27f42a43e64fa288aa77eff80352da"
 
 [[d1_databases]]
-binding = "bgdb" # available in your Worker on env.DB
+binding = "bgdb"
 database_name = "friends"
-database_id = "f68e9fa5-4aea-45db-9516-2d7052e936fa"
+database_id = "8f3f7e10-1474-4daa-aa96-498352fd4505"
