@@ -1,54 +1,61 @@
 // 首先定义模型配置
 export const modelConfigs = [
+  // 调度模型
+  {
+    model: "qwen3.6-plus",
+    apiKey: "CODING_PLAN_API_KEY",
+    baseURL: "http://129.226.92.196:3000/v1"
+  },
+  // 对话模型
   {
     model: "qwen-plus",
-    apiKey: "DASHSCOPE_API_KEY", // 这里存储环境变量的 key 名称
-    baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    apiKey: "CODING_PLAN_API_KEY",
+    baseURL: "http://129.226.92.196:3000/v1"
   },
   {
     model: "deepseek-v3-250324",
-    apiKey: "ARK_API_KEY",
-    baseURL: "https://ark.cn-beijing.volces.com/api/v3"
+    apiKey: "CODING_PLAN_API_KEY",
+    baseURL: "http://129.226.92.196:3000/v1"
   },
   {
     model: "hunyuan-turbos-latest",
-    apiKey: "HUNYUAN_API_KEY1",
-    baseURL: "https://api.hunyuan.cloud.tencent.com/v1"
+    apiKey: "CODING_PLAN_API_KEY",
+    baseURL: "http://129.226.92.196:3000/v1"
   },
   {
-    model: "doubao-1-5-lite-32k-250115",//豆包模型|火山引擎接入点（改成自己的）
-    apiKey: "ARK_API_KEY",
-    baseURL: "https://ark.cn-beijing.volces.com/api/v3"
+    model: "doubao-1-5-lite-32k-250115",
+    apiKey: "CODING_PLAN_API_KEY",
+    baseURL: "http://129.226.92.196:3000/v1"
   },
   {
-    model: "ep-20250306223646-szzkw",//deepseekv火山引擎接入点（改成自己的）
-    apiKey: "ARK_API_KEY1",
-    baseURL: "https://ark.cn-beijing.volces.com/api/v3"
+    model: "ep-20250306223646-szzkw",
+    apiKey: "CODING_PLAN_API_KEY",
+    baseURL: "http://129.226.92.196:3000/v1"
   },
   {
     model: "glm-4-air",
-    apiKey: "GLM_API_KEY",
-    baseURL: "https://open.bigmodel.cn/api/paas/v4/"
+    apiKey: "CODING_PLAN_API_KEY",
+    baseURL: "http://129.226.92.196:3000/v1"
   },
   {
-    model: "qwen-turbo",//调度模型
-    apiKey: "DASHSCOPE_API_KEY", // 这里存储环境变量的 key 名称
-    baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    model: "qwen-turbo",
+    apiKey: "CODING_PLAN_API_KEY",
+    baseURL: "http://129.226.92.196:3000/v1"
   },
   {
     model: "deepseek-chat",
-    apiKey: "DEEPSEEK_API_KEY",
-    baseURL: "https://api.deepseek.com/v1"
+    apiKey: "CODING_PLAN_API_KEY",
+    baseURL: "http://129.226.92.196:3000/v1"
   },
   {
     model: "moonshot-v1-8k",
-    apiKey: "KIMI_API_KEY",
-    baseURL: "https://api.moonshot.cn/v1"
+    apiKey: "CODING_PLAN_API_KEY",
+    baseURL: "http://129.226.92.196:3000/v1"
   },
   {
     model: "ernie-3.5-128k",
-    apiKey: "BAIDU_API_KEY",
-    baseURL: "https://qianfan.baidubce.com/v2"
+    apiKey: "CODING_PLAN_API_KEY",
+    baseURL: "http://129.226.92.196:3000/v1"
   },
   // 以下是自定义添加的模型
   {
