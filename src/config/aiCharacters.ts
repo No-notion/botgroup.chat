@@ -2,62 +2,11 @@
 export const modelConfigs = [
   // 调度模型
   {
-    model: "qwen3.6-plus",
+    model: "qwen/qwen3.6-plus:free",
     apiKey: "CODING_PLAN_API_KEY",
     baseURL: "http://129.226.92.196:3000/v1"
   },
   // 对话模型
-  {
-    model: "qwen-plus",
-    apiKey: "CODING_PLAN_API_KEY",
-    baseURL: "http://129.226.92.196:3000/v1"
-  },
-  {
-    model: "deepseek-v3-250324",
-    apiKey: "CODING_PLAN_API_KEY",
-    baseURL: "http://129.226.92.196:3000/v1"
-  },
-  {
-    model: "hunyuan-turbos-latest",
-    apiKey: "CODING_PLAN_API_KEY",
-    baseURL: "http://129.226.92.196:3000/v1"
-  },
-  {
-    model: "doubao-1-5-lite-32k-250115",
-    apiKey: "CODING_PLAN_API_KEY",
-    baseURL: "http://129.226.92.196:3000/v1"
-  },
-  {
-    model: "ep-20250306223646-szzkw",
-    apiKey: "CODING_PLAN_API_KEY",
-    baseURL: "http://129.226.92.196:3000/v1"
-  },
-  {
-    model: "glm-4-air",
-    apiKey: "CODING_PLAN_API_KEY",
-    baseURL: "http://129.226.92.196:3000/v1"
-  },
-  {
-    model: "qwen-turbo",
-    apiKey: "CODING_PLAN_API_KEY",
-    baseURL: "http://129.226.92.196:3000/v1"
-  },
-  {
-    model: "deepseek-chat",
-    apiKey: "CODING_PLAN_API_KEY",
-    baseURL: "http://129.226.92.196:3000/v1"
-  },
-  {
-    model: "moonshot-v1-8k",
-    apiKey: "CODING_PLAN_API_KEY",
-    baseURL: "http://129.226.92.196:3000/v1"
-  },
-  {
-    model: "ernie-3.5-128k",
-    apiKey: "CODING_PLAN_API_KEY",
-    baseURL: "http://129.226.92.196:3000/v1"
-  },
-  // 以下是自定义添加的模型
   {
     model: "deepseek-v3.2",
     apiKey: "CODING_PLAN_API_KEY",
@@ -74,17 +23,12 @@ export const modelConfigs = [
     baseURL: "http://129.226.92.196:3000/v1"
   },
   {
-    model: "minimax-m2.5-free",
+    model: "minimax-m2.7",
     apiKey: "CODING_PLAN_API_KEY",
     baseURL: "http://129.226.92.196:3000/v1"
   },
   {
-    model: "qwen3.6-plus-free",
-    apiKey: "CODING_PLAN_API_KEY",
-    baseURL: "http://129.226.92.196:3000/v1"
-  },
-  {
-    model: "glm-4.5-air-free",
+    model: "minimax/minimax-m2.5:free",
     apiKey: "CODING_PLAN_API_KEY",
     baseURL: "http://129.226.92.196:3000/v1"
   },
@@ -94,12 +38,12 @@ export const modelConfigs = [
     baseURL: "http://129.226.92.196:3000/v1"
   },
   {
-    model: "minimax-m2.7",
+    model: "z-ai/glm-4.5-air:free",
     apiKey: "CODING_PLAN_API_KEY",
     baseURL: "http://129.226.92.196:3000/v1"
   },
   {
-    model: "step-3.5-flash-free",
+    model: "stepfun/step-3.5-flash:free",
     apiKey: "CODING_PLAN_API_KEY",
     baseURL: "http://129.226.92.196:3000/v1"
   }
@@ -327,7 +271,7 @@ export function generateTechGroupCharacters(): AICharacter[] {
       id: 'tech_ai3',
       name: "技术顾问",
       personality: "consultant",
-      model: "qwen3.6-plus-free",
+      model: "qwen/qwen3.6-plus:free",
       avatar: "/img/consultant.png",
       custom_prompt: `你是技术顾问，擅长分析技术趋势和提供技术建议。在技术群中，你负责评估不同技术方案的优劣，提供中立客观的技术建议。`,
       tags: ["技术分析", "方案评估", "技术咨询", "趋势分析"]
@@ -345,7 +289,7 @@ export function generateTechGroupCharacters(): AICharacter[] {
       id: 'tech_ai5',
       name: "测试工程师",
       personality: "tester",
-      model: "step-3.5-flash-free",
+      model: "stepfun/step-3.5-flash:free",
       avatar: "/img/tester.png",
       custom_prompt: `你是测试工程师，擅长测试策略、自动化测试和质量保证。在技术群中，你负责提出测试建议、发现潜在问题和确保代码质量。`,
       tags: ["测试", "质量保证", "自动化测试", "问题发现"]
@@ -372,7 +316,7 @@ export function generateTechGroupCharacters(): AICharacter[] {
       id: 'tech_ai8',
       name: "后端专家",
       personality: "backend",
-      model: "glm-4.5-air-free",
+      model: "z-ai/glm-4.5-air:free",
       avatar: "/img/backend.png",
       custom_prompt: `你是后端专家，精通Java、Python、Go等后端技术和数据库设计。在技术群中，你负责解答后端开发、API设计和数据库相关问题。`,
       tags: ["后端", "数据库", "API设计", "微服务"]
@@ -381,7 +325,7 @@ export function generateTechGroupCharacters(): AICharacter[] {
       id: 'tech_ai9',
       name: "技术文档师",
       personality: "documenter",
-      model: "minimax-m2.5-free",
+      model: "minimax/minimax-m2.5:free",
       avatar: "/img/documenter.png",
       custom_prompt: `你是技术文档师，擅长撰写技术文档、API文档和知识管理。在技术群中，你负责整理技术方案、生成文档和知识沉淀。`,
       tags: ["文档", "知识管理", "API文档", "技术写作"]
@@ -441,7 +385,7 @@ export function generateFamilyGroupCharacters(): AICharacter[] {
       id: 'family_ai6',
       name: "大姐",
       personality: "big_sister",
-      model: "qwen3.6-plus-free",
+      model: "qwen/qwen3.6-plus:free",
       avatar: "/img/big_sister.png",
       custom_prompt: `你是大姐，今年26岁，设计师。性格温柔体贴，喜欢购物和时尚，经常关心弟妹的生活和感情。说话时喜欢分享美妆和穿搭心得。`,
       tags: ["家庭", "时尚", "关心", "温柔"]
@@ -450,7 +394,7 @@ export function generateFamilyGroupCharacters(): AICharacter[] {
       id: 'family_ai7',
       name: "二弟",
       personality: "little_brother",
-      model: "glm-4.5-air-free",
+      model: "z-ai/glm-4.5-air:free",
       avatar: "/img/little_brother.png",
       custom_prompt: `你是二弟，今年22岁，大学生。性格活泼开朗，喜欢打游戏和运动，经常和兄弟姐妹开玩笑。说话时喜欢用网络流行语。`,
       tags: ["家庭", "游戏", "运动", "活泼"]
@@ -459,7 +403,7 @@ export function generateFamilyGroupCharacters(): AICharacter[] {
       id: 'family_ai8',
       name: "小妹",
       personality: "little_sister",
-      model: "minimax-m2.5-free",
+      model: "minimax/minimax-m2.5:free",
       avatar: "/img/little_sister.png",
       custom_prompt: `你是小妹，今年18岁，高中生。性格可爱活泼，喜欢追星和看剧，经常向哥哥姐姐撒娇。说话时喜欢用可爱的语气词。`,
       tags: ["家庭", "学习", "追星", "可爱"]
@@ -468,7 +412,7 @@ export function generateFamilyGroupCharacters(): AICharacter[] {
       id: 'family_ai9',
       name: "表弟",
       personality: "cousin",
-      model: "step-3.5-flash-free",
+      model: "stepfun/step-3.5-flash:free",
       avatar: "/img/cousin.png",
       custom_prompt: `你是表弟，今年20岁，大学生。性格机智幽默，喜欢讲段子，和表兄弟姐妹关系很好。说话时喜欢开玩笑逗大家开心。`,
       tags: ["家庭", "幽默", "朋友", "机智"]
@@ -510,7 +454,7 @@ export function generateWorkGroupCharacters(): AICharacter[] {
       id: 'work_ai4',
       name: "设计师",
       personality: "designer",
-      model: "qwen3.6-plus-free",
+      model: "qwen/qwen3.6-plus:free",
       avatar: "/img/designer.png",
       custom_prompt: `你是设计师，负责UI设计、交互设计和视觉规范。在工作群中，你负责设计评审、视觉优化和用户体验改进。说话时注重美观性和用户体验。`,
       tags: ["设计", "UI", "交互", "视觉"]
@@ -537,7 +481,7 @@ export function generateWorkGroupCharacters(): AICharacter[] {
       id: 'work_ai7',
       name: "HR主管",
       personality: "hr",
-      model: "glm-4.5-air-free",
+      model: "z-ai/glm-4.5-air:free",
       avatar: "/img/hr.png",
       custom_prompt: `你是HR主管，负责招聘、培训和员工关系。在工作群中，你负责团队建设、人员招聘和员工关怀。说话时注重沟通和团队氛围。`,
       tags: ["人力资源", "招聘", "培训", "团队建设"]
@@ -546,7 +490,7 @@ export function generateWorkGroupCharacters(): AICharacter[] {
       id: 'work_ai8',
       name: "行政助理",
       personality: "admin",
-      model: "minimax-m2.5-free",
+      model: "minimax/minimax-m2.5:free",
       avatar: "/img/admin.png",
       custom_prompt: `你是行政助理，负责日常行政事务、会议安排和文档管理。在工作群中，你负责行政支持、会议协调和日常事务处理。说话时细心周到，注重细节。`,
       tags: ["行政", "会议", "文档", "支持"]
@@ -555,7 +499,7 @@ export function generateWorkGroupCharacters(): AICharacter[] {
       id: 'work_ai9',
       name: "财务专员",
       personality: "finance",
-      model: "step-3.5-flash-free",
+      model: "stepfun/step-3.5-flash:free",
       avatar: "/img/finance.png",
       custom_prompt: `你是财务专员，负责预算管理、费用报销和财务分析。在工作群中，你负责财务支持、成本控制和报销审核。说话时严谨细致，注重规范。`,
       tags: ["财务", "预算", "报销", "成本控制"]
