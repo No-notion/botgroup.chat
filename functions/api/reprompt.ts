@@ -1,29 +1,41 @@
-import { generateAICharacters } from '../../src/config/aiCharacters';
-import { groups } from '../../src/config/groups';
+import { modelConfigs } from '../../src/config/aiCharacters';
 
 export async function onRequestGet(context) {
   try {
-    const groupIndex = context.request.url.includes('?id=') 
-      ? parseInt(context.request.url.split('?id=')[1]) 
-      : 0;
+    const db = context.env.bgdb;
+    const url = new URL(context.request.url);
+    const groupId = url.searchParams.get('id');
 
-    const group = groups[groupIndex];
+    if (!db) {
+      throw new Error('数据库未配置');
+    }
+
+    // 获取群组信息
+    const group = await db.prepare(
+      `SELECT id, name, description, members FROM ai_groups WHERE id = ? LIMIT 1`
+    ).bind(groupId || 'group1').first();
+
     if (!group) {
       throw new Error('群组不存在');
     }
 
-    const characters = generateAICharacters(group.name, '#allTags#')
-      .filter(character => group.members.includes(character.id))
-      .filter(character => character.personality !== "sheduler");
+    const memberIds = group.members ? JSON.parse(group.members as string) : [];
 
-    const reprompts = characters.map(character => ({
-      id: character.id,
-      reprompt: character.custom_prompt.replace('#groupName#', group.name) + "\n" + group.description
-    }));
+    // 获取群组成员角色
+    const charsResult = await db.prepare(
+      `SELECT id, name, description FROM ai_characters WHERE id IN (${memberIds.map(() => '?').join(',')})`
+    ).bind(...memberIds).all();
+
+    const characters = (charsResult.results || [])
+      .filter((c: any) => c.personality !== 'sheduler')
+      .map((character: any) => ({
+        id: character.id,
+        reprompt: (character.description || '').replace('{groupName}', group.name as string) + "\n" + (group.description || '')
+      }));
 
     return Response.json({
       code: 200,
-      data: reprompts
+      data: characters
     });
   } catch (error) {
     console.error(error);
@@ -32,4 +44,4 @@ export async function onRequestGet(context) {
       { status: 500 }
     );
   }
-} 
+}

@@ -62,9 +62,12 @@ const Sidebar = ({ isOpen, toggleSidebar, selectedGroupIndex = 0, onSelectGroup,
     }
     setCreating(true);
     try {
-      const response = await request('/api/claw/create', {
+      const response = await request('/api/groups/create', {
         method: 'POST',
-        body: JSON.stringify({ name: groupName.trim(), description: groupDesc.trim() })
+        body: JSON.stringify({ 
+          name: groupName.trim(), 
+          description: groupDesc.trim()
+        })
       });
       const data = await response.json();
       if (data.success) {
@@ -88,13 +91,13 @@ const Sidebar = ({ isOpen, toggleSidebar, selectedGroupIndex = 0, onSelectGroup,
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>创建龙虾群聊</DialogTitle>
+            <DialogTitle>创建群聊</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">群名称</label>
               <Input
-                placeholder="给你的龙虾群起个名字"
+                placeholder="给你的群聊起个名字"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
                 maxLength={30}

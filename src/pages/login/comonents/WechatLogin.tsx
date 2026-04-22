@@ -126,7 +126,7 @@ const WechatLogin: React.FC<WechatLoginProps> = ({ handleLoginSuccess }) => {
         {/* Logo */}
         <div className="flex items-center justify-center mb-6">
           <span 
-            style={{fontFamily: 'Audiowide, system-ui', color: '#ff6600'}} 
+            style={{fontFamily: 'Audiowide, system-ui', color: '#07C160'}} 
             className={`${isMobile ? 'text-2xl' : 'text-3xl'} ml-2`}
           >
             botgroup.chat
@@ -142,7 +142,7 @@ const WechatLogin: React.FC<WechatLoginProps> = ({ handleLoginSuccess }) => {
           <div className={`${isMobile ? 'w-48 h-48' : 'w-56 h-56'} border-2 border-gray-200 rounded-lg flex items-center justify-center bg-gray-50`}>
             {loginStatus === 'loading' ? (
               <div className="flex flex-col items-center space-y-2">
-                <div className="w-8 h-8 animate-spin rounded-full border-2 border-[#ff6600] border-t-transparent" />
+                <div className="w-8 h-8 animate-spin rounded-full border-2 border-[#07C160] border-t-transparent" />
                 <span className="text-sm text-gray-500">加载中...</span>
               </div>
             ) : loginStatus === 'expired' ? (
@@ -188,7 +188,7 @@ const WechatLogin: React.FC<WechatLoginProps> = ({ handleLoginSuccess }) => {
             <Button
               onClick={refreshQrCode}
               disabled={isLoading}
-              className={`bg-[#ff6600] hover:bg-[#e65c00] text-white rounded-lg ${isMobile ? 'px-4 py-2 text-sm' : 'px-6 py-2.5 text-base'}`}
+              className={`bg-[#07C160] hover:bg-[#06AD56] text-white rounded-lg ${isMobile ? 'px-4 py-2 text-sm' : 'px-6 py-2.5 text-base'}`}
             >
               {isLoading ? (
                 <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />

@@ -93,7 +93,7 @@ const PhoneLogin: React.FC<PhoneLoginProps> = ({ onLogin, handleLoginSuccess }) 
         {/* Logo */}
         <div className="flex items-center justify-center mb-6">
           <span 
-            style={{fontFamily: 'Audiowide, system-ui', color: '#ff6600'}} 
+            style={{fontFamily: 'Audiowide, system-ui', color: '#07C160'}} 
             className={`${isMobile ? 'text-2xl' : 'text-3xl'} ml-2`}
           >
             botgroup.chat
@@ -104,7 +104,7 @@ const PhoneLogin: React.FC<PhoneLoginProps> = ({ onLogin, handleLoginSuccess }) 
         </div>
         <form onSubmit={handleSubmit} className={`${isMobile ? 'space-y-4' : 'space-y-6'}`}>
           <div>
-            <div className={`flex items-center border rounded-lg ${isMobile ? 'p-2.5' : 'p-3'} ${isMobile ? 'h-[42px]' : 'h-[46px]'} focus-within:border-[#ff6600]`}>
+            <div className={`flex items-center border rounded-lg ${isMobile ? 'p-2.5' : 'p-3'} ${isMobile ? 'h-[42px]' : 'h-[46px]'} focus-within:border-[#07C160]`}>
               <span className={`text-gray-400 mr-2 ${isMobile ? 'text-sm' : 'text-base'}`}>+86</span>
               <Input
                 type="tel"
@@ -124,13 +124,13 @@ const PhoneLogin: React.FC<PhoneLoginProps> = ({ onLogin, handleLoginSuccess }) 
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 maxLength={6}
-                className={`border rounded-lg ${isMobile ? 'p-2.5' : 'p-3'} ${isMobile ? 'h-[42px]' : 'h-[46px]'} focus:border-[#ff6600] focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none ${isMobile ? 'text-base' : 'text-base'}`}
+                className={`border rounded-lg ${isMobile ? 'p-2.5' : 'p-3'} ${isMobile ? 'h-[42px]' : 'h-[46px]'} focus:border-[#07C160] focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none ${isMobile ? 'text-base' : 'text-base'}`}
               />
               <Button
                 type="button"
                 onClick={handleSendCode}
                 disabled={countdown > 0 || isLoading}
-                className={`bg-white text-[#ff6600] border border-[#ff6600] hover:bg-[#ff6600] hover:text-white rounded-lg ${isMobile ? 'px-3 h-[42px] text-xs' : 'px-6 h-[46px] text-sm'} whitespace-nowrap`}
+                className={`bg-white text-[#07C160] border border-[#07C160] hover:bg-[#07C160] hover:text-white rounded-lg ${isMobile ? 'px-3 h-[42px] text-xs' : 'px-6 h-[46px] text-sm'} whitespace-nowrap`}
               >
                 {countdown > 0 ? `${countdown}秒后重试` : '发送验证码'}
               </Button>
@@ -138,7 +138,7 @@ const PhoneLogin: React.FC<PhoneLoginProps> = ({ onLogin, handleLoginSuccess }) 
           </div>
           <Button
             type="submit"
-            className={`w-full bg-[#ff6600] hover:bg-[#e65c00] text-white rounded-lg ${isMobile ? 'py-2.5 text-sm' : 'py-3 text-base'}`}
+            className={`w-full bg-[#07C160] hover:bg-[#06AD56] text-white rounded-lg ${isMobile ? 'py-2.5 text-sm' : 'py-3 text-base'}`}
             disabled={isLoading}
           >
             {isLoading ? (

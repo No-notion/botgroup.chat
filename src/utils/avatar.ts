@@ -9,10 +9,10 @@ interface User {
 interface AICharacter {
   id: string;
   name: string;
+  description: string;
   personality: string;
   model: string;
   avatar?: string;
-  custom_prompt?: string;
   tags?: string[];
 }
 

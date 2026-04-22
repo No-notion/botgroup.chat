@@ -58,7 +58,7 @@ const PasswordLogin: React.FC<PasswordLoginProps> = ({ handleLoginSuccess }) => 
         {/* Logo */}
         <div className="flex items-center justify-center mb-6">
           <span 
-            style={{fontFamily: 'Audiowide, system-ui', color: '#ff6600'}} 
+            style={{fontFamily: 'Audiowide, system-ui', color: '#07C160'}} 
             className={`${isMobile ? 'text-2xl' : 'text-3xl'} ml-2`}
           >
             botgroup.chat
@@ -74,7 +74,7 @@ const PasswordLogin: React.FC<PasswordLoginProps> = ({ handleLoginSuccess }) => 
               placeholder="请输入用户名"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className={`border rounded-lg ${isMobile ? 'p-2.5' : 'p-3'} ${isMobile ? 'h-[42px]' : 'h-[46px]'} focus:border-[#ff6600] focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none ${isMobile ? 'text-base' : 'text-base'}`}
+              className={`border rounded-lg ${isMobile ? 'p-2.5' : 'p-3'} ${isMobile ? 'h-[42px]' : 'h-[46px]'} focus:border-[#07C160] focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none ${isMobile ? 'text-base' : 'text-base'}`}
             />
           </div>
           <div>
@@ -83,12 +83,12 @@ const PasswordLogin: React.FC<PasswordLoginProps> = ({ handleLoginSuccess }) => 
               placeholder="请输入密码"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`border rounded-lg ${isMobile ? 'p-2.5' : 'p-3'} ${isMobile ? 'h-[42px]' : 'h-[46px]'} focus:border-[#ff6600] focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none ${isMobile ? 'text-base' : 'text-base'}`}
+              className={`border rounded-lg ${isMobile ? 'p-2.5' : 'p-3'} ${isMobile ? 'h-[42px]' : 'h-[46px]'} focus:border-[#07C160] focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none ${isMobile ? 'text-base' : 'text-base'}`}
             />
           </div>
           <Button
             type="submit"
-            className={`w-full bg-[#ff6600] hover:bg-[#e65c00] text-white rounded-lg ${isMobile ? 'py-2.5 text-sm' : 'py-3 text-base'}`}
+            className={`w-full bg-[#07C160] hover:bg-[#06AD56] text-white rounded-lg ${isMobile ? 'py-2.5 text-sm' : 'py-3 text-base'}`}
             disabled={isLoading}
           >
             {isLoading ? (

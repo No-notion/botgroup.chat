@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,11 +21,11 @@ import {
   Edit, 
   Save, 
   X, 
-  GripVertical,
   Sparkles,
   Tag,
   MessageSquare,
-  Settings
+  Settings,
+  Upload
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { request } from '@/utils/request';
@@ -37,26 +37,28 @@ interface CharacterManagerProps {
   onCharactersChange?: () => void;
 }
 
-interface Stage {
-  name: string;
-  prompt: string;
-}
-
 interface CustomCharacter extends AICharacter {
   isCustom?: boolean;
+  isSystem?: boolean;
   is_public?: boolean;
 }
 
 const emptyCharacter: Partial<CustomCharacter> = {
   name: '',
+  description: '',
   personality: '',
-  model: 'qwen-plus',
+  scenario: '',
+  first_mes: '',
+  mes_example: '',
+  model: 'deepseek-v3.2',
   avatar: '',
-  custom_prompt: '',
   tags: [],
-  stages: [],
-  rag: false,
-  knowledge: '',
+  system_prompt: '',
+  post_history_instructions: '',
+  alternate_greetings: [],
+  creator_notes: '',
+  creator: '',
+  character_version: '',
   is_public: false
 };
 
@@ -70,11 +72,12 @@ export const CharacterManager: React.FC<CharacterManagerProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<Partial<CustomCharacter>>(emptyCharacter);
   const [newTag, setNewTag] = useState('');
-  const [newStage, setNewStage] = useState<Stage>({ name: '', prompt: '' });
+  const [newGreeting, setNewGreeting] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 加载自定义角色
   useEffect(() => {
     if (isOpen) {
       loadCharacters();
@@ -135,19 +138,14 @@ export const CharacterManager: React.FC<CharacterManagerProps> = ({
 
     setIsLoading(true);
     try {
-      const isUpdate = selectedCharacter?.isCustom;
-      const url = isUpdate 
-        ? `/api/characters?id=${selectedCharacter.id}` 
-        : '/api/characters';
-      
-      const response = await request(url, {
-        method: isUpdate ? 'PUT' : 'POST',
+      const response = await request('/api/characters', {
+        method: 'POST',
         body: JSON.stringify(editForm)
       });
 
       const data = await response.json();
       if (data.success) {
-        toast.success(isUpdate ? '角色更新成功' : '角色创建成功');
+        toast.success('角色保存成功');
         setIsEditing(false);
         loadCharacters();
         onCharactersChange?.();
@@ -158,6 +156,50 @@ export const CharacterManager: React.FC<CharacterManagerProps> = ({
       toast.error('保存失败');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.json')) {
+      toast.error('请选择 JSON 格式的角色卡片文件');
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      const text = await file.text();
+      let cardJson;
+      try {
+        cardJson = JSON.parse(text);
+      } catch {
+        toast.error('文件格式错误，无法解析 JSON');
+        setIsImporting(false);
+        return;
+      }
+
+      const response = await request('/api/characters/import', {
+        method: 'POST',
+        body: JSON.stringify(cardJson)
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        toast.success(data.message || '导入成功');
+        loadCharacters();
+        onCharactersChange?.();
+      } else {
+        toast.error(data.message || '导入失败');
+      }
+    } catch (error) {
+      toast.error('导入失败');
+    } finally {
+      setIsImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -177,27 +219,18 @@ export const CharacterManager: React.FC<CharacterManagerProps> = ({
     });
   };
 
-  const handleAddStage = () => {
-    if (!newStage.name.trim() || !newStage.prompt.trim()) return;
-    const currentStages = editForm.stages || [];
-    setEditForm({
-      ...editForm,
-      stages: [...currentStages, { ...newStage }]
-    });
-    setNewStage({ name: '', prompt: '' });
+  const handleAddGreeting = () => {
+    if (!newGreeting.trim()) return;
+    const current = editForm.alternate_greetings || [];
+    setEditForm({ ...editForm, alternate_greetings: [...current, newGreeting.trim()] });
+    setNewGreeting('');
   };
 
-  const handleRemoveStage = (index: number) => {
+  const handleRemoveGreeting = (index: number) => {
     setEditForm({
       ...editForm,
-      stages: (editForm.stages || []).filter((_, i) => i !== index)
+      alternate_greetings: (editForm.alternate_greetings || []).filter((_, i) => i !== index)
     });
-  };
-
-  const handleUpdateStage = (index: number, field: 'name' | 'prompt', value: string) => {
-    const stages = [...(editForm.stages || [])];
-    stages[index] = { ...stages[index], [field]: value };
-    setEditForm({ ...editForm, stages });
   };
 
   return (
@@ -205,7 +238,7 @@ export const CharacterManager: React.FC<CharacterManagerProps> = ({
       <DialogContent className="max-w-4xl max-h-[90vh] p-0">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-orange-500" />
+            <Sparkles className="w-5 h-5 text-green-500" />
             角色管理
           </DialogTitle>
         </DialogHeader>
@@ -214,17 +247,34 @@ export const CharacterManager: React.FC<CharacterManagerProps> = ({
           {/* 左侧角色列表 */}
           <div className="w-1/3 border-r">
             <div className="p-4 border-b flex justify-between items-center">
-              <span className="font-medium">自定义角色</span>
-              <Button size="sm" onClick={handleCreateNew}>
-                <Plus className="w-4 h-4 mr-1" />
-                新建
-              </Button>
+              <span className="font-medium">所有角色</span>
+              <div className="flex gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  className="hidden"
+                  onChange={handleImportFile}
+                />
+                <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isImporting}>
+                  {isImporting ? (
+                    <div className="w-4 h-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : (
+                    <Upload className="w-4 h-4 mr-1" />
+                  )}
+                  导入
+                </Button>
+                <Button size="sm" onClick={handleCreateNew}>
+                  <Plus className="w-4 h-4 mr-1" />
+                  新建
+                </Button>
+              </div>
             </div>
             <ScrollArea className="h-[calc(100%-60px)]">
               <div className="p-2 space-y-1">
                 {characters.length === 0 ? (
                   <div className="p-4 text-center text-muted-foreground text-sm">
-                    暂无自定义角色
+                    加载中...
                   </div>
                 ) : (
                   characters.map((character) => (
@@ -232,18 +282,35 @@ export const CharacterManager: React.FC<CharacterManagerProps> = ({
                       key={character.id}
                       className={`p-3 rounded-lg cursor-pointer transition-colors ${
                         selectedCharacter?.id === character.id
-                          ? 'bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800'
+                          ? 'bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800'
                           : 'hover:bg-muted'
                       }`}
-                      onClick={() => setSelectedCharacter(character)}
+                      onClick={() => {
+                        setSelectedCharacter(character);
+                        if (isEditing) {
+                          setEditForm({ ...character });
+                        }
+                      }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          {character.avatar && (
-                            <img src={character.avatar} className="w-8 h-8 rounded-full" alt="" />
+                          {character.avatar ? (
+                            <img src={character.avatar} className="w-8 h-8 rounded-full object-cover" alt="" />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                              <Sparkles className="w-4 h-4" />
+                            </div>
                           )}
                           <div>
-                            <div className="font-medium">{character.name}</div>
+                            <div className="font-medium flex items-center gap-2">
+                              {character.name}
+                              {character.isSystem && !character.isCustom && (
+                                <Badge variant="outline" className="text-xs">预设</Badge>
+                              )}
+                              {character.isCustom && character.isSystem && (
+                                <Badge variant="secondary" className="text-xs">已修改</Badge>
+                              )}
+                            </div>
                             <div className="text-xs text-muted-foreground">
                               {character.model}
                             </div>
@@ -261,17 +328,19 @@ export const CharacterManager: React.FC<CharacterManagerProps> = ({
                           >
                             <Edit className="w-3.5 h-3.5" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-destructive hover:text-destructive"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(character);
-                            }}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
+                          {character.isCustom && !character.isSystem && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-destructive hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(character);
+                              }}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                       {character.tags && character.tags.length > 0 && (
@@ -315,7 +384,10 @@ export const CharacterManager: React.FC<CharacterManagerProps> = ({
                       )}
                     </div>
                     <h3 className="text-xl font-bold mb-2">{selectedCharacter.name}</h3>
-                    <p className="text-sm mb-4">{selectedCharacter.personality}</p>
+                    <p className="text-sm mb-1 text-muted-foreground">{selectedCharacter.personality}</p>
+                    {selectedCharacter.description && (
+                      <p className="text-sm mb-4 line-clamp-3">{selectedCharacter.description}</p>
+                    )}
                     <Button onClick={() => handleEdit(selectedCharacter)}>
                       <Edit className="w-4 h-4 mr-2" />
                       编辑角色
@@ -407,6 +479,31 @@ export const CharacterManager: React.FC<CharacterManagerProps> = ({
                       </div>
 
                       <div>
+                        <Label htmlFor="description">角色描述 *</Label>
+                        <Textarea
+                          id="description"
+                          value={editForm.description || ''}
+                          onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                          placeholder="角色的详细描述，定义角色的身份、行为和回复风格"
+                          rows={5}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          可用变量: #groupName# (群名)
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="scenario">场景设定</Label>
+                        <Textarea
+                          id="scenario"
+                          value={editForm.scenario || ''}
+                          onChange={(e) => setEditForm({ ...editForm, scenario: e.target.value })}
+                          placeholder="角色所处的场景和背景设定"
+                          rows={3}
+                        />
+                      </div>
+
+                      <div>
                         <Label className="flex items-center gap-2">
                           <Tag className="w-4 h-4" />
                           标签
@@ -439,101 +536,136 @@ export const CharacterManager: React.FC<CharacterManagerProps> = ({
                     {/* 提示词设置 */}
                     <TabsContent value="prompt" className="space-y-4 mt-0">
                       <div>
-                        <Label htmlFor="custom_prompt">自定义提示词</Label>
+                        <Label htmlFor="first_mes">开场白 (first_mes)</Label>
                         <Textarea
-                          id="custom_prompt"
-                          value={editForm.custom_prompt || ''}
-                          onChange={(e) => setEditForm({ ...editForm, custom_prompt: e.target.value })}
-                          placeholder="输入角色的自定义提示词，定义角色的行为和回复风格"
-                          rows={6}
+                          id="first_mes"
+                          value={editForm.first_mes || ''}
+                          onChange={(e) => setEditForm({ ...editForm, first_mes: e.target.value })}
+                          placeholder="角色发送的第一条消息"
+                          rows={3}
                         />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          可用变量: #groupName# (群名), #allTags# (所有标签)
-                        </p>
                       </div>
 
                       <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <Label>对话阶段</Label>
-                          <span className="text-xs text-muted-foreground">
-                            用于游戏主持人等需要多阶段对话的角色
-                          </span>
-                        </div>
-                        
-                        <div className="space-y-2 mb-4">
-                          <div className="flex gap-2">
-                            <Input
-                              value={newStage.name}
-                              onChange={(e) => setNewStage({ ...newStage, name: e.target.value })}
-                              placeholder="阶段名称"
-                              className="w-32"
-                            />
-                            <Input
-                              value={newStage.prompt}
-                              onChange={(e) => setNewStage({ ...newStage, prompt: e.target.value })}
-                              placeholder="阶段提示词"
-                            />
-                            <Button type="button" variant="outline" onClick={handleAddStage}>
-                              <Plus className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-
-                        {(editForm.stages || []).map((stage, index) => (
-                          <div key={index} className="flex items-start gap-2 p-2 bg-muted rounded-lg mb-2">
-                            <GripVertical className="w-4 h-4 mt-2 text-muted-foreground cursor-move" />
-                            <div className="flex-1 space-y-2">
-                              <Input
-                                value={stage.name}
-                                onChange={(e) => handleUpdateStage(index, 'name', e.target.value)}
-                                placeholder="阶段名称"
+                        <Label htmlFor="alternate_greetings">备选开场白</Label>
+                        <div className="space-y-2 mb-2">
+                          {(editForm.alternate_greetings || []).map((greeting, index) => (
+                            <div key={index} className="flex items-start gap-2">
+                              <Textarea
+                                value={greeting}
+                                onChange={(e) => {
+                                  const greetings = [...(editForm.alternate_greetings || [])];
+                                  greetings[index] = e.target.value;
+                                  setEditForm({ ...editForm, alternate_greetings: greetings });
+                                }}
+                                rows={2}
+                                className="flex-1"
                               />
-                              <Input
-                                value={stage.prompt}
-                                onChange={(e) => handleUpdateStage(index, 'prompt', e.target.value)}
-                                placeholder="阶段提示词"
-                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive shrink-0"
+                                onClick={() => handleRemoveGreeting(index)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
                             </div>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="text-destructive"
-                              onClick={() => handleRemoveStage(index)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            value={newGreeting}
+                            onChange={(e) => setNewGreeting(e.target.value)}
+                            placeholder="添加备选开场白"
+                            onKeyPress={(e) => e.key === 'Enter' && handleAddGreeting()}
+                          />
+                          <Button type="button" variant="outline" onClick={handleAddGreeting}>
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="mes_example">对话示例 (mes_example)</Label>
+                        <Textarea
+                          id="mes_example"
+                          value={editForm.mes_example || ''}
+                          onChange={(e) => setEditForm({ ...editForm, mes_example: e.target.value })}
+                          placeholder="角色的对话风格示例，格式如：&lt;START&gt;\n{{user}}: 你好\n{{char}}: 你好啊！"
+                          rows={5}
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="system_prompt">系统提示词 (system_prompt)</Label>
+                        <Textarea
+                          id="system_prompt"
+                          value={editForm.system_prompt || ''}
+                          onChange={(e) => setEditForm({ ...editForm, system_prompt: e.target.value })}
+                          placeholder="注入到系统消息中的额外指令"
+                          rows={3}
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="post_history_instructions">历史后指令 (post_history_instructions)</Label>
+                        <Textarea
+                          id="post_history_instructions"
+                          value={editForm.post_history_instructions || ''}
+                          onChange={(e) => setEditForm({ ...editForm, post_history_instructions: e.target.value })}
+                          placeholder="在对话历史之后注入的指令，用于调整角色在长对话中的行为"
+                          rows={3}
+                        />
                       </div>
                     </TabsContent>
 
                     {/* 高级设置 */}
                     <TabsContent value="advanced" className="space-y-4 mt-0">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label>RAG 知识库</Label>
-                          <p className="text-xs text-muted-foreground">
-                            启用后角色将使用知识库增强回答
-                          </p>
-                        </div>
-                        <Switch
-                          checked={editForm.rag || false}
-                          onCheckedChange={(checked) => setEditForm({ ...editForm, rag: checked })}
+                      <div>
+                        <Label htmlFor="creator">创作者</Label>
+                        <Input
+                          id="creator"
+                          value={editForm.creator || ''}
+                          onChange={(e) => setEditForm({ ...editForm, creator: e.target.value })}
+                          placeholder="角色创作者名称"
                         />
                       </div>
 
-                      {editForm.rag && (
-                        <div>
-                          <Label htmlFor="knowledge">知识库名称</Label>
-                          <Input
-                            id="knowledge"
-                            value={editForm.knowledge || ''}
-                            onChange={(e) => setEditForm({ ...editForm, knowledge: e.target.value })}
-                            placeholder="输入知识库名称"
-                          />
-                        </div>
-                      )}
+                      <div>
+                        <Label htmlFor="character_version">角色版本</Label>
+                        <Input
+                          id="character_version"
+                          value={editForm.character_version || ''}
+                          onChange={(e) => setEditForm({ ...editForm, character_version: e.target.value })}
+                          placeholder="如 1.0.0"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="creator_notes">创作者备注</Label>
+                        <Textarea
+                          id="creator_notes"
+                          value={editForm.creator_notes || ''}
+                          onChange={(e) => setEditForm({ ...editForm, creator_notes: e.target.value })}
+                          placeholder="对角色的使用建议和备注"
+                          rows={3}
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="character_book">角色书 (character_book)</Label>
+                        <Textarea
+                          id="character_book"
+                          value={editForm.character_book || ''}
+                          onChange={(e) => setEditForm({ ...editForm, character_book: e.target.value })}
+                          placeholder="角色知识库 JSON，包含触发关键词和对应内容"
+                          rows={5}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Character Card V2 格式的角色书 JSON
+                        </p>
+                      </div>
 
                       <div className="flex items-center justify-between">
                         <div>

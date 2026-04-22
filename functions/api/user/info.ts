@@ -9,7 +9,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         // 从数据库获取用户信息
         const db = env.bgdb;
         const userInfo = await db.prepare(`
-            SELECT id, phone, nickname, avatar_url, status
+            SELECT id, phone, nickname, avatar_url, status, bio, occupation, interests
             FROM users 
             WHERE id = ?
         `).bind(data.user.userId).first();

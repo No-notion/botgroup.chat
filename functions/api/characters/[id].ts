@@ -47,7 +47,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
         }
 
         const body = await request.json();
-        const { name, personality, model, avatar, custom_prompt, tags, stages, rag, knowledge, is_public } = body as any;
+        const { name, description, personality, scenario, first_mes, mes_example, model, avatar, tags, system_prompt, post_history_instructions, alternate_greetings, creator_notes, character_book, creator, character_version, is_public } = body as any;
 
         if (!name || !model) {
             return new Response(
@@ -58,19 +58,26 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
 
         await db.prepare(`
             UPDATE custom_characters 
-            SET name = ?, personality = ?, model = ?, avatar = ?, custom_prompt = ?, 
-                tags = ?, stages = ?, rag = ?, knowledge = ?, is_public = ?, updated_at = CURRENT_TIMESTAMP
+            SET name = ?, description = ?, personality = ?, scenario = ?, first_mes = ?, mes_example = ?, model = ?, avatar = ?, 
+                tags = ?, system_prompt = ?, post_history_instructions = ?, alternate_greetings = ?, creator_notes = ?, character_book = ?, creator = ?, character_version = ?, is_public = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         `).bind(
             name,
+            description || '',
             personality || '',
+            scenario || '',
+            first_mes || '',
+            mes_example || '',
             model,
             avatar || null,
-            custom_prompt || '',
             tags ? JSON.stringify(tags) : null,
-            stages ? JSON.stringify(stages) : null,
-            rag ? 1 : 0,
-            knowledge || null,
+            system_prompt || '',
+            post_history_instructions || '',
+            alternate_greetings ? JSON.stringify(alternate_greetings) : null,
+            creator_notes || '',
+            character_book || '',
+            creator || '',
+            character_version || '',
             is_public ? 1 : 0,
             id
         ).run();

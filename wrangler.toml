@@ -1,6 +1,10 @@
 name = "botgroup-chat"
 pages_build_output_dir = "dist"
 
+[vars]
+QDRANT_URL = "http://localhost:6333"
+EMBEDDING_BASE_URL = "http://129.226.92.196:3000/v1"
+
 [[kv_namespaces]]
 binding = "bgkv"
 id = "bc27f42a43e64fa288aa77eff80352da"

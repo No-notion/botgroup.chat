@@ -6,6 +6,9 @@ interface UserInfo {
   nickname: string;
   avatar_url: string | null;
   status: number;
+  bio?: string;           // 个人简介
+  occupation?: string;    // 职业
+  interests?: string;     // 兴趣爱好
 }
 
 interface UserStore {
@@ -19,7 +22,10 @@ export const useUserStore = create<UserStore>((set) => ({
     phone: '',
     nickname: '',
     avatar_url: null,
-    status: 0
+    status: 0,
+    bio: '',
+    occupation: '',
+    interests: ''
   },
   setUserInfo: (userInfo: UserInfo) => set({ userInfo })
 })); 

@@ -8,7 +8,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         
         // 解析请求体
         const body = await request.json();
-        const { nickname, avatar_url } = body;
+        const { nickname, avatar_url, bio, occupation, interests } = body;
 
         // 构建 SQL 更新语句和参数
         let sql = 'UPDATE users SET updated_at = DATETIME(\'now\')';
@@ -41,7 +41,52 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 );
             }
             sql += ', avatar_url = ?';
-            params.push(avatar_url);
+            params.push(avatar_url || null);
+        }
+
+        // 如果有个人简介更新
+        if (bio !== undefined) {
+            if (typeof bio !== 'string' || bio.length > 200) {
+                return new Response(
+                    JSON.stringify({ 
+                        success: false, 
+                        message: '个人简介过长' 
+                    }), 
+                    { status: 400, headers: { 'Content-Type': 'application/json' } }
+                );
+            }
+            sql += ', bio = ?';
+            params.push(bio || null);
+        }
+
+        // 如果有职业更新
+        if (occupation !== undefined) {
+            if (typeof occupation !== 'string' || occupation.length > 50) {
+                return new Response(
+                    JSON.stringify({ 
+                        success: false, 
+                        message: '职业信息过长' 
+                    }), 
+                    { status: 400, headers: { 'Content-Type': 'application/json' } }
+                );
+            }
+            sql += ', occupation = ?';
+            params.push(occupation || null);
+        }
+
+        // 如果有兴趣爱好更新
+        if (interests !== undefined) {
+            if (typeof interests !== 'string' || interests.length > 100) {
+                return new Response(
+                    JSON.stringify({ 
+                        success: false, 
+                        message: '兴趣爱好过长' 
+                    }), 
+                    { status: 400, headers: { 'Content-Type': 'application/json' } }
+                );
+            }
+            sql += ', interests = ?';
+            params.push(interests || null);
         }
 
         // 添加 WHERE 条件
@@ -68,7 +113,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         // 获取更新后的用户信息
         const userInfo = await env.bgdb.prepare(`
-            SELECT id, phone, nickname, avatar_url, status
+            SELECT id, phone, nickname, avatar_url, status, bio, occupation, interests
             FROM users 
             WHERE id = ?
         `).bind(data.user.userId).first();

@@ -1,4 +1,4 @@
-import { modelConfigs, generateAICharacters } from '../../src/config/aiCharacters';
+import { modelConfigs } from '../../src/config/aiCharacters';
 import OpenAI from 'openai';
 
 interface AICharacter {
@@ -37,8 +37,25 @@ export async function onRequestPost({ env, request }) {
 }
 
 async function analyzeMessageWithAI(message: string, allTags: string[], env: any, history: MessageHistory[] = []): Promise<string[]> {
-    const shedulerAI = generateAICharacters(message, allTags.join(','))[0];
-    const modelConfig = modelConfigs.find(config => config.model === shedulerAI.model);
+    const db = env.bgdb;
+    let schedulerModel = modelConfigs[0].model;
+    let schedulerPrompt = '';
+
+    if (db) {
+      try {
+        const schedulerResult = await db.prepare(
+          `SELECT model, description FROM ai_characters WHERE id = 'ai0' LIMIT 1`
+        ).first();
+        if (schedulerResult) {
+          schedulerModel = schedulerResult.model as string || schedulerModel;
+          schedulerPrompt = (schedulerResult.description as string || '').replace('{allTags}', allTags.join(','));
+        }
+      } catch (e) {
+        console.error('Failed to load scheduler from DB:', e);
+      }
+    }
+
+    const modelConfig = modelConfigs.find(config => config.model === schedulerModel) || modelConfigs[0];
     const apiKey = env[modelConfig.apiKey];
     if (!apiKey) {
       throw new Error(`${modelConfig.model} 的API密钥未配置`);
@@ -48,14 +65,16 @@ async function analyzeMessageWithAI(message: string, allTags: string[], env: any
       baseURL: modelConfig.baseURL,
     });
 
-    const prompt = shedulerAI.custom_prompt;
+    if (!schedulerPrompt) {
+      schedulerPrompt = `你是一个群聊总结分析专家，你在一个聊天群里，请分析群用户消息和上文群聊内容\n1、只能从给定的标签列表中选择最相关的标签，可选标签：${allTags.join(',')}。\n2、请只返回标签列表，用逗号分隔，不要有其他解释。\n3、回复格式示例：文字游戏, 新闻报道, 娱乐`;
+    }
 
     try {
       const completion = await openai.chat.completions.create({
-        model: shedulerAI.model,
+        model: schedulerModel,
         messages: [
-          { role: "user", content: prompt },
-          ...history.slice(-10), // 添加历史消息
+          { role: "user", content: schedulerPrompt },
+          ...history.slice(-10),
           { role: "user", content: message }
         ],
       });
